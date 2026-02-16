@@ -1,0 +1,10 @@
+{
+  "renamed": [
+    {
+      "page_id": 221,
+      "old_name": "EBUSD_OPTS=\"--device=_dev_ttyUSB0 -p 8888 --scanconfig --accesslevel=* --configpath=_home_pi_ebusd_contrib_etc_ebusd_ --mqtthost=192.168.4.212 --mqttport=1883 --mqtttopic=ebusd_%circuit_%name",
+      "new_name": "EBUSD_OPTS=\"--device=_dev_ttyUSB0 -p 8888 --scanconfig --accesslevel=* --configpath=_home_pi_ebusd_contrib_etc_ebusd_ --mqtthost=192.168.4.212 --mqttport=1883 --mqtttopic=ebusd_%circuit_%name --enablehex --httpport=8889 --htmlpath=_home_pi_ebusd_contrib_",
+      "ratio": 0.979
+    }
+  ]
+}

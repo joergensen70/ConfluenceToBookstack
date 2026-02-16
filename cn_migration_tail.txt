@@ -1,0 +1,36 @@
+﻿[1/6] Lade Seiten aus Space 'CN'...
+Gefunden: 50 Seiten
+[2/6] Ermittele/erstelle Book 'Confluence -Computer & Netzwerk'...
+Book ID: 24
+[3/6] Erstelle Kapitel/Seitenstruktur in BookStack...
+  Struktur: FTP Zugang (Kinder: 0)
+  Struktur: Volkszähler (Kinder: 35)
+    Kapitel erstellt: Volkszähler -> 31
+[4/6] Übertrage Inhalte (50 Seiten)...
+    Bild migriert (1/1): worddav3e50dbbb9ad97e7b67ffe0d4cfa42d46.png
+  (1/50) FTP Zugang -> Seite 163, Bilder: 1
+  (2/50) Volkszähler -> Seite 164, Bilder: 0
+    Bild migriert (1/2): worddava068794795d2f3dea18cdceb01c37ecb.png
+    Bild migriert (2/2): worddav181571f1d8d38c7508b9c717e2bac607.png
+  (3/50) Internet Seiten (Quellen) -> Seite 165, Bilder: 2
+    Bild migriert (1/2): worddavd2d504f1e3972da90aec77cf7e5cba0e.png
+    Bild migriert (2/2): worddav55440b216a3702b4a7dc0a9d2b68d334.png
+  (4/50) NAS auf Raspberry mounten -> Seite 166, Bilder: 2
+    Bild migriert (1/2): worddav6481d63156efd721094067a7bac67d0b.png
+    Bild migriert (2/2): worddav7ce253700f006fa5e52f7f0626231ba9.png
+  (5/50) 14 Sonstiges -> Seite 167, Bilder: 2
+  (6/50) Raspberry Pi_ WLAN einrichten (Edimax) -> Seite 168, Bilder: 0
+    Bild migriert (1/2): worddav803fab54f9c97e86a9887819612c440c.png
+    Bild migriert (2/2): worddavc225c24d9998a4883e9dcb765b54cf05.png
+  (7/50) Raspberry Pi_ WLAN einrichten (Edimax) / WLAN-Konfiguration unter Raspbian -> Seite 169, Bilder: 2
+  (8/50) Raspberry Pi_ WLAN einrichten (Edimax) / Verbindung herstellen -> Seite 170, Bilder: 0
+  (9/50) 11 SQL Konfiguration -> Seite 171, Bilder: 0
+    Bild migriert (1/1): worddavd1e7a4e4af38e5b11e60439e35259420.png
+  (10/50) 11 SQL Konfiguration / 11.1 SQL Befehle eingeben -> Seite 172, Bilder: 1
+  (11/50) Können MariaDB-Einstellungen auf dem Synology NAS angepasst werden? -> Seite 173, Bilder: 0
+    Bild migriert (1/1): image2023-12-6_11-38-16.png
+  (12/50) Können MariaDB-Einstellungen auf dem Synology NAS angepasst werden? / 11.1.2 Kanal löschen (muss noch etwas besseres geben)_ -> Seite 174, Bilder: 1
+  (13/50) Können MariaDB-Einstellungen auf dem Synology NAS angepasst werden? / SELECT * FROM `volkszaehler`.`aggregate` WHERE `aggregate`.`channel_id` = 36 -> Seite 175, Bilder: 0
+  (14/50) Können MariaDB-Einstellungen auf dem Synology NAS angepasst werden? / 12 WLAN mit dem Raspberry -> Seite 176, Bilder: 0
+    Bild migriert (1/2): image2023-11-27_10-12-15.png
+    Bild migriert (2/2): image2023-11-27_10-14-19.png

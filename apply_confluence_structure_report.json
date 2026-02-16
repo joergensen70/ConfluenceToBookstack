@@ -1,0 +1,171 @@
+{
+  "generated_at": "2026-02-16 17:01:57",
+  "books_created": [],
+  "chapters_created": [],
+  "chapters_updated": [],
+  "pages_moved": [
+    {
+      "confluence_id": "29032449",
+      "from_page_id": 162,
+      "to_chapter_id": 205,
+      "new_name": "xZENT f270",
+      "priority": 1
+    },
+    {
+      "confluence_id": "36438029",
+      "from_page_id": 161,
+      "to_chapter_id": 205,
+      "new_name": "Küchenschränke",
+      "priority": 2
+    },
+    {
+      "confluence_id": "36438051",
+      "from_page_id": 160,
+      "to_chapter_id": 205,
+      "new_name": "LiFePo4",
+      "priority": 3
+    },
+    {
+      "confluence_id": "36438083",
+      "from_page_id": 159,
+      "to_chapter_id": 205,
+      "new_name": "Ambilight",
+      "priority": 4
+    },
+    {
+      "confluence_id": "36536351",
+      "from_page_id": 156,
+      "to_chapter_id": 205,
+      "new_name": "Tasche für Campingstühle",
+      "priority": 5
+    },
+    {
+      "confluence_id": "36536363",
+      "from_page_id": 155,
+      "to_chapter_id": 205,
+      "new_name": "Räder und Reifen",
+      "priority": 6
+    },
+    {
+      "confluence_id": "36536417",
+      "from_page_id": 153,
+      "to_chapter_id": 205,
+      "new_name": "Rückfahrkamera",
+      "priority": 7
+    },
+    {
+      "confluence_id": "36569101",
+      "from_page_id": 151,
+      "to_chapter_id": 205,
+      "new_name": "Solaranlage",
+      "priority": 8
+    },
+    {
+      "confluence_id": "36569113",
+      "from_page_id": 150,
+      "to_chapter_id": 205,
+      "new_name": "Becher / Stiftehalter",
+      "priority": 9
+    },
+    {
+      "confluence_id": "36569125",
+      "from_page_id": 149,
+      "to_chapter_id": 205,
+      "new_name": "Tasche für Auffahrkeile",
+      "priority": 10
+    },
+    {
+      "confluence_id": "36634647",
+      "from_page_id": 147,
+      "to_chapter_id": 205,
+      "new_name": "Frontbügel",
+      "priority": 11
+    },
+    {
+      "confluence_id": "36634659",
+      "from_page_id": 146,
+      "to_chapter_id": 205,
+      "new_name": "Blinker",
+      "priority": 12
+    },
+    {
+      "confluence_id": "36667403",
+      "from_page_id": 145,
+      "to_chapter_id": 205,
+      "new_name": "LED Spots",
+      "priority": 13
+    },
+    {
+      "confluence_id": "36700183",
+      "from_page_id": 143,
+      "to_chapter_id": 205,
+      "new_name": "Kühlschrank Beleuchtung",
+      "priority": 14
+    },
+    {
+      "confluence_id": "36732951",
+      "from_page_id": 141,
+      "to_chapter_id": 205,
+      "new_name": "eTrailer Gasfüllstand / Reifendruck / Nivellieren",
+      "priority": 15
+    },
+    {
+      "confluence_id": "37552176",
+      "from_page_id": 140,
+      "to_chapter_id": 205,
+      "new_name": "Handyhalterung",
+      "priority": 16
+    },
+    {
+      "confluence_id": "3964929",
+      "from_page_id": 138,
+      "to_chapter_id": 204,
+      "new_name": "DSG Reset VCDS und Anfahrassistent VCP",
+      "priority": 1
+    }
+  ],
+  "chapter_content_pages_deleted": [],
+  "unmatched_confluence_pages": [
+    {
+      "id": "36470795",
+      "title": "Wechselrichter im Cliff 600",
+      "desired_name": "Wechselrichter im Cliff 600"
+    },
+    {
+      "id": "36470827",
+      "title": "Handyablage",
+      "desired_name": "Handyablage"
+    },
+    {
+      "id": "36536395",
+      "title": "Lautsprecher / Subwoofer",
+      "desired_name": "Lautsprecher / Subwoofer"
+    },
+    {
+      "id": "36569089",
+      "title": "Heckgarage",
+      "desired_name": "Heckgarage"
+    },
+    {
+      "id": "36634625",
+      "title": "Fahrradträger",
+      "desired_name": "Fahrradträger"
+    },
+    {
+      "id": "36700171",
+      "title": "Relais für Wasserpumpe / Tauchpumpe / Mikroschalter Armatur",
+      "desired_name": "Relais für Wasserpumpe / Tauchpumpe / Mikroschalter Armatur"
+    },
+    {
+      "id": "36732929",
+      "title": "Trennwand Heckgarage",
+      "desired_name": "Trennwand Heckgarage"
+    },
+    {
+      "id": "3964934",
+      "title": "Codings",
+      "desired_name": "Codings"
+    }
+  ],
+  "errors": []
+}

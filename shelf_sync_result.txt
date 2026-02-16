@@ -1,0 +1,8 @@
+STATUS=OK
+SHELF_ID=4
+MIGRATION_BOOKS_FOUND=2
+BOOK=23:Confluence - Auto
+BOOK=24:Confluence -Computer & Netzwerk
+SHELF_BOOKS_TOTAL=2
+SHELF_BOOK=23:Confluence - Auto
+SHELF_BOOK=24:Confluence -Computer & Netzwerk

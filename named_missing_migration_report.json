@@ -1,0 +1,154 @@
+{
+  "generated_at": "2026-02-16 15:15:15",
+  "book": {
+    "id": 26,
+    "name": "Confluence -Computer & Netzwerk"
+  },
+  "targets_before": [
+    {
+      "target": "Web Cam",
+      "confluence_matches": [
+        "Web Cam"
+      ],
+      "bookstack_matches_before": [
+        "Web Cam"
+      ]
+    },
+    {
+      "target": "Anleitungsartikel",
+      "confluence_matches": [
+        "Anleitungsartikel"
+      ],
+      "bookstack_matches_before": [
+        "Anleitungsartikel"
+      ]
+    },
+    {
+      "target": "RS485/Modbus Stromzähler",
+      "confluence_matches": [
+        "RS485/Modbus Stromzähler an NodeRed"
+      ],
+      "bookstack_matches_before": []
+    },
+    {
+      "target": "Outlook 365 winmail.dat",
+      "confluence_matches": [
+        "Outlook 365 winmail.dat Problem"
+      ],
+      "bookstack_matches_before": []
+    },
+    {
+      "target": "Moved to bookstack",
+      "confluence_matches": [
+        "Moved to bookstack"
+      ],
+      "bookstack_matches_before": [
+        "Moved to bookstack"
+      ]
+    },
+    {
+      "target": "Optional Hostname",
+      "confluence_matches": [
+        "Optional Hostname für myFritz (IPv6 only)"
+      ],
+      "bookstack_matches_before": []
+    }
+  ],
+  "migrated_count": 9,
+  "migrated": [
+    {
+      "confluence_page_id": "40501251",
+      "title": "Moved to bookstack",
+      "bookstack_page_id": 226,
+      "migrated_images": 0
+    },
+    {
+      "confluence_page_id": "39518289",
+      "title": "Joomla Update",
+      "bookstack_page_id": 230,
+      "migrated_images": 1
+    },
+    {
+      "confluence_page_id": "39026758",
+      "title": "Bookstack einrichten",
+      "bookstack_page_id": 232,
+      "migrated_images": 1
+    },
+    {
+      "confluence_page_id": "1507330",
+      "title": "RepairDatabaseMariaDB10",
+      "bookstack_page_id": 235,
+      "migrated_images": 1
+    },
+    {
+      "confluence_page_id": "1474707",
+      "title": "passwd – Passwort ändern",
+      "bookstack_page_id": 244,
+      "migrated_images": 1
+    },
+    {
+      "confluence_page_id": "1474695",
+      "title": "ps -e – Prozesse anzeigen",
+      "bookstack_page_id": 250,
+      "migrated_images": 1
+    },
+    {
+      "confluence_page_id": "1474684",
+      "title": "df – Speicherplatzbelegung anzeigen",
+      "bookstack_page_id": 259,
+      "migrated_images": 1
+    },
+    {
+      "confluence_page_id": "1474673",
+      "title": "cat – Datei-Inhalt anzeigen",
+      "bookstack_page_id": 263,
+      "migrated_images": 1
+    },
+    {
+      "confluence_page_id": "1474662",
+      "title": "man – Anleitung zum Befehl anzeigen",
+      "bookstack_page_id": 267,
+      "migrated_images": 1
+    }
+  ],
+  "errors_count": 1,
+  "errors": [
+    {
+      "confluence_page_id": "1474718",
+      "title": "crontab - um automatisch Anwendungen zu starten",
+      "error": "500 Server Error: Internal Server Error for url: https://bookstack.joerg-middendorf.net/api/pages"
+    }
+  ],
+  "targets_after": [
+    {
+      "target": "Web Cam",
+      "bookstack_matches_after": [
+        "Web Cam"
+      ]
+    },
+    {
+      "target": "Anleitungsartikel",
+      "bookstack_matches_after": [
+        "Anleitungsartikel"
+      ]
+    },
+    {
+      "target": "RS485/Modbus Stromzähler",
+      "bookstack_matches_after": []
+    },
+    {
+      "target": "Outlook 365 winmail.dat",
+      "bookstack_matches_after": []
+    },
+    {
+      "target": "Moved to bookstack",
+      "bookstack_matches_after": [
+        "Moved to bookstack"
+      ]
+    },
+    {
+      "target": "Optional Hostname",
+      "bookstack_matches_after": []
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+﻿{
+    "generated_at":  "2026-02-16 13:55:47",
+    "migrated_books":  [
+                           {
+                               "id":  23,
+                               "name":  "Confluence - Auto"
+                           },
+                           {
+                               "id":  24,
+                               "name":  "Confluence - Computer \u0026 Netzwerk"
+                           }
+                       ],
+    "counts":  [
+                   {
+                       "book_id":  23,
+                       "book_name":  "Confluence - Auto",
+                       "inferred_space_key":  "AUTO",
+                       "confluence_pages":  28,
+                       "bookstack_pages":  28,
+                       "match":  true
+                   },
+                   {
+                       "book_id":  24,
+                       "book_name":  "Confluence - Computer \u0026 Netzwerk",
+                       "inferred_space_key":  "CN",
+                       "confluence_pages":  50,
+                       "bookstack_pages":  50,
+                       "match":  true
+                   }
+               ],
+    "duplicate_candidates":  [
+
+                             ],
+    "deletions":  [
+
+                  ]
+}

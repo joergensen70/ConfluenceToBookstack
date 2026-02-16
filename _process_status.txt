@@ -1,0 +1,14 @@
+﻿
+
+ProcessId   : 19720
+Name        : python.exe
+CommandLine : "V:\Dokumente\Krankenversicherung\Patientenakte\Laborbefunde\.ven
+              v\Scripts\python.exe" -u confluence_to_bookstack_migration.py 
+
+ProcessId   : 45492
+Name        : python.exe
+CommandLine : "V:\Dokumente\Krankenversicherung\Patientenakte\Laborbefunde\.ven
+              v\Scripts\python.exe" -u confluence_to_bookstack_migration.py 
+
+
+

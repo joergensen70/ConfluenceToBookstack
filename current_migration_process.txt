@@ -1,0 +1,14 @@
+﻿
+
+ProcessId    : 19720
+CreationDate : 16.02.2026 13:28:51
+CommandLine  : "V:\Dokumente\Krankenversicherung\Patientenakte\Laborbefunde\.ve
+               nv\Scripts\python.exe" -u confluence_to_bookstack_migration.py 
+
+ProcessId    : 45492
+CreationDate : 16.02.2026 13:28:52
+CommandLine  : "V:\Dokumente\Krankenversicherung\Patientenakte\Laborbefunde\.ve
+               nv\Scripts\python.exe" -u confluence_to_bookstack_migration.py 
+
+
+

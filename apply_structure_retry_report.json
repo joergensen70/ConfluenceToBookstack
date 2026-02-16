@@ -1,0 +1,571 @@
+{
+  "generated_at": "2026-02-16 16:58:37",
+  "books_created": [],
+  "chapters_created": [
+    {
+      "id": 203,
+      "book_id": 46,
+      "name": "Moved to bookstack"
+    }
+  ],
+  "pages_moved": [
+    {
+      "confluence_id": "22249474",
+      "page_id": 1,
+      "chapter_id": 191,
+      "new_name": "RS485/MQTT Adapter"
+    },
+    {
+      "confluence_id": "786618",
+      "page_id": 301,
+      "chapter_id": 184,
+      "new_name": "Automatisches Backup installieren / Automatisch starten (systemd Service Manager)"
+    },
+    {
+      "confluence_id": "786632",
+      "page_id": 297,
+      "chapter_id": 184,
+      "new_name": "Automatisches Backup installieren / 00_05_Vaillant_VR921_0902_5703_21_19_31_0020260962_0938_016911_N8"
+    },
+    {
+      "confluence_id": "786649",
+      "page_id": 303,
+      "chapter_id": 184,
+      "new_name": "Middleware 2 Daten auslesen_ / Samba Server einrichten"
+    },
+    {
+      "confluence_id": "786670",
+      "page_id": 196,
+      "chapter_id": 184,
+      "new_name": "Installing node-red / MQTT-Broker “Mosquitto” installieren"
+    },
+    {
+      "confluence_id": "786701",
+      "page_id": 188,
+      "chapter_id": 184,
+      "new_name": "1 Volkzaehler Image aufspielen / SD Karte mit SD Formater formatieren"
+    },
+    {
+      "confluence_id": "786710",
+      "page_id": 186,
+      "chapter_id": 184,
+      "new_name": "1 Volkzaehler Image aufspielen / Zu verwendendes Raspberry Image (Stand 24.09.2015), inklusive Daemon für Raspberry Erweiterung"
+    },
+    {
+      "confluence_id": "786733",
+      "page_id": 180,
+      "chapter_id": 184,
+      "new_name": "6 Kanäle konfigurieren / 8 Admin Account anlegen (Optional)"
+    },
+    {
+      "confluence_id": "786750",
+      "page_id": 176,
+      "chapter_id": 184,
+      "new_name": "Können MariaDB-Einstellungen auf dem Synology NAS angepasst werden? / 12 WLAN mit dem Raspberry"
+    },
+    {
+      "confluence_id": "786752",
+      "page_id": 175,
+      "chapter_id": 184,
+      "new_name": "Können MariaDB-Einstellungen auf dem Synology NAS angepasst werden? / SELECT * FROM `volkszaehler`.`aggregate` WHERE `aggregate`.`channel_id` = 36"
+    },
+    {
+      "confluence_id": "786758",
+      "page_id": 169,
+      "chapter_id": 184,
+      "new_name": "Raspberry Pi_ WLAN einrichten (Edimax) / WLAN-Konfiguration unter Raspbian"
+    }
+  ],
+  "unmatched": [
+    {
+      "confluence_id": "10977281",
+      "title": "15 ESP Easy Sensoren in Volkszähler einbinden",
+      "desired": "15 ESP Easy Sensoren in Volkszähler einbinden"
+    },
+    {
+      "confluence_id": "1277953",
+      "title": "nginx Synology Reverse Proxy",
+      "desired": "nginx Synology Reverse Proxy"
+    },
+    {
+      "confluence_id": "14811137",
+      "title": "16 Shelly über MQTT und NodeRed",
+      "desired": "16 Shelly über MQTT und NodeRed"
+    },
+    {
+      "confluence_id": "1507330",
+      "title": "RepairDatabaseMariaDB10",
+      "desired": "RepairDatabaseMariaDB10"
+    },
+    {
+      "confluence_id": "35749889",
+      "title": "VPN OpenVPN einrichten",
+      "desired": "VPN OpenVPN einrichten"
+    },
+    {
+      "confluence_id": "39026758",
+      "title": "Bookstack einrichten",
+      "desired": "Bookstack einrichten"
+    },
+    {
+      "confluence_id": "39518289",
+      "title": "Joomla Update",
+      "desired": "Joomla Update"
+    },
+    {
+      "confluence_id": "786530",
+      "title": "Konfiguration nach IP Adressen Wechsel updaten",
+      "desired": "Konfiguration nach IP Adressen Wechsel updaten"
+    },
+    {
+      "confluence_id": "786538",
+      "title": "Self Hosted Port Mapper mit 6tunnel Einrichten",
+      "desired": "Self Hosted Port Mapper mit 6tunnel Einrichten"
+    },
+    {
+      "confluence_id": "786601",
+      "title": "Middleware Daten auslesen_",
+      "desired": "Middleware Daten auslesen_"
+    },
+    {
+      "confluence_id": "786605",
+      "title": "Automatisches Backup installieren",
+      "desired": "Automatisches Backup installieren"
+    },
+    {
+      "confluence_id": "786652",
+      "title": "Middleware 2 Daten auslesen_",
+      "desired": "Middleware 2 Daten auslesen_"
+    },
+    {
+      "confluence_id": "786657",
+      "title": "Installing node-red",
+      "desired": "Installing node-red"
+    },
+    {
+      "confluence_id": "786659",
+      "title": "EBUSD_OPTS=\"--device=_dev_ttyUSB0 -p 8888 --scanconfig --accesslevel=* --configpath=_home_pi_ebusd_contrib_etc_ebusd_ --mqtthost=192.168.4.212 --mqttport=1883 --mqtttopic=ebusd_%circuit_%name\"",
+      "desired": "EBUSD_OPTS=\"--device=_dev_ttyUSB0 -p 8888 --scanconfig --accesslevel=* --configpath=_home_pi_ebusd_contrib_etc_ebusd_ --mqtthost=192.168.4.212 --mqttport=1883 --mqtttopic=ebusd_%circuit_%name\""
+    },
+    {
+      "confluence_id": "786661",
+      "title": "Ebusd Mqtt access",
+      "desired": "Ebusd Mqtt access"
+    },
+    {
+      "confluence_id": "786666",
+      "title": "Restore Datenbank",
+      "desired": "Restore Datenbank"
+    },
+    {
+      "confluence_id": "786668",
+      "title": "Backup Datenbank mit php-myadmin",
+      "desired": "Backup Datenbank mit php-myadmin"
+    },
+    {
+      "confluence_id": "786682",
+      "title": "Volkszaehler_VirtuelleKanäle",
+      "desired": "Volkszaehler_VirtuelleKanäle"
+    },
+    {
+      "confluence_id": "786685",
+      "title": "Datenbank verschieben",
+      "desired": "Datenbank verschieben"
+    },
+    {
+      "confluence_id": "786704",
+      "title": "1 Volkzaehler Image aufspielen",
+      "desired": "1 Volkzaehler Image aufspielen"
+    },
+    {
+      "confluence_id": "786706",
+      "title": "Neue Anleitung mit Raspberry Erweiterung 2017",
+      "desired": "Neue Anleitung mit Raspberry Erweiterung 2017"
+    },
+    {
+      "confluence_id": "786713",
+      "title": "3 Partition an genutzte Karte anpassen",
+      "desired": "3 Partition an genutzte Karte anpassen"
+    },
+    {
+      "confluence_id": "786720",
+      "title": "5 IP Adresse ändern",
+      "desired": "5 IP Adresse ändern"
+    },
+    {
+      "confluence_id": "786723",
+      "title": "4 Demo Kanäle löschen",
+      "desired": "4 Demo Kanäle löschen"
+    },
+    {
+      "confluence_id": "786725",
+      "title": "6 Kanäle konfigurieren",
+      "desired": "6 Kanäle konfigurieren"
+    },
+    {
+      "confluence_id": "786731",
+      "title": "9 Root Passwort vergeben (optional)",
+      "desired": "9 Root Passwort vergeben (optional)"
+    },
+    {
+      "confluence_id": "786741",
+      "title": "Können MariaDB-Einstellungen auf dem Synology NAS angepasst werden?",
+      "desired": "Können MariaDB-Einstellungen auf dem Synology NAS angepasst werden?"
+    },
+    {
+      "confluence_id": "786746",
+      "title": "11 SQL Konfiguration",
+      "desired": "11 SQL Konfiguration"
+    },
+    {
+      "confluence_id": "786748",
+      "title": "Raspberry Pi_ WLAN einrichten (Edimax)",
+      "desired": "Raspberry Pi_ WLAN einrichten (Edimax)"
+    },
+    {
+      "confluence_id": "786761",
+      "title": "14 Sonstiges",
+      "desired": "14 Sonstiges"
+    },
+    {
+      "confluence_id": "786767",
+      "title": "NAS auf Raspberry mounten",
+      "desired": "NAS auf Raspberry mounten"
+    },
+    {
+      "confluence_id": "786770",
+      "title": "Internet Seiten (Quellen)",
+      "desired": "Internet Seiten (Quellen)"
+    },
+    {
+      "confluence_id": "1474573",
+      "title": "nano",
+      "desired": "Linux Befehle / nano"
+    },
+    {
+      "confluence_id": "1474577",
+      "title": "sudo -i",
+      "desired": "Linux Befehle / sudo -i"
+    },
+    {
+      "confluence_id": "1474589",
+      "title": "rm - Files löschen",
+      "desired": "Linux Befehle / rm - Files löschen"
+    },
+    {
+      "confluence_id": "1474593",
+      "title": "ip _ Ifconfig",
+      "desired": "Linux Befehle / ip _ Ifconfig"
+    },
+    {
+      "confluence_id": "1474597",
+      "title": "shutdown",
+      "desired": "Linux Befehle / shutdown"
+    },
+    {
+      "confluence_id": "1474601",
+      "title": "service",
+      "desired": "Linux Befehle / service"
+    },
+    {
+      "confluence_id": "1474614",
+      "title": "pwd – wo bin ich",
+      "desired": "Linux Befehle / pwd – wo bin ich"
+    },
+    {
+      "confluence_id": "1474625",
+      "title": "which – wo ist ein Programm installiert",
+      "desired": "Linux Befehle / which – wo ist ein Programm installiert"
+    },
+    {
+      "confluence_id": "1474636",
+      "title": "ls – Verzeichnis-Inhalt anzeigen",
+      "desired": "Linux Befehle / ls – Verzeichnis-Inhalt anzeigen"
+    },
+    {
+      "confluence_id": "1474657",
+      "title": "clear – Terminal räumen",
+      "desired": "Linux Befehle / clear – Terminal räumen"
+    },
+    {
+      "confluence_id": "1474662",
+      "title": "man – Anleitung zum Befehl anzeigen",
+      "desired": "Linux Befehle / man – Anleitung zum Befehl anzeigen"
+    },
+    {
+      "confluence_id": "1474684",
+      "title": "df – Speicherplatzbelegung anzeigen",
+      "desired": "Linux Befehle / df – Speicherplatzbelegung anzeigen"
+    },
+    {
+      "confluence_id": "1474695",
+      "title": "ps -e – Prozesse anzeigen",
+      "desired": "Linux Befehle / ps -e – Prozesse anzeigen"
+    },
+    {
+      "confluence_id": "1474707",
+      "title": "passwd – Passwort ändern",
+      "desired": "Linux Befehle / passwd – Passwort ändern"
+    },
+    {
+      "confluence_id": "1474718",
+      "title": "crontab - um automatisch Anwendungen zu starten",
+      "desired": "Linux Befehle / crontab - um automatisch Anwendungen zu starten"
+    },
+    {
+      "confluence_id": "786599",
+      "title": "VZ Virtuellen Kanal über http erzeugen (private)",
+      "desired": "Middleware Daten auslesen_ / VZ Virtuellen Kanal über http erzeugen (private)"
+    },
+    {
+      "confluence_id": "786603",
+      "title": "Ebus Daemon installieren",
+      "desired": "Automatisches Backup installieren / Ebus Daemon installieren"
+    },
+    {
+      "confluence_id": "786608",
+      "title": "Testen",
+      "desired": "Automatisches Backup installieren / Testen"
+    },
+    {
+      "confluence_id": "786610",
+      "title": "Compilieren",
+      "desired": "Automatisches Backup installieren / Compilieren"
+    },
+    {
+      "confluence_id": "786612",
+      "title": "Sourcen laden",
+      "desired": "Automatisches Backup installieren / Sourcen laden"
+    },
+    {
+      "confluence_id": "786614",
+      "title": "Benötigte Pakete installieren",
+      "desired": "Automatisches Backup installieren / Benötigte Pakete installieren"
+    },
+    {
+      "confluence_id": "786616",
+      "title": "EBUSD_OPTS=\"--device=_dev_ttyUSB0 -p 8888 -l _var_log_ebusd.log --scanconfig --accesslevel=* --httpport=8889 --htmlpath=_home_pi_ebusd_contrib_html --configpath=_home_pi_ebusd_contrib_etc_ebusd_ --mqtthost=192.168.4.212 --mqttport=1883 --mqtttopic=ebusd_",
+      "desired": "Automatisches Backup installieren / EBUSD_OPTS=\"--device=_dev_ttyUSB0 -p 8888 -l _var_log_ebusd.log --scanconfig --accesslevel=* --httpport=8889 --htmlpath=_home_pi_ebusd_contrib_html --configpath=_home_pi_ebusd_contrib_etc_ebusd_ --mqtthost=192.168.4.212 --mqttport=1883 --mqtttopic=ebusd_"
+    },
+    {
+      "confluence_id": "786621",
+      "title": "Installieren",
+      "desired": "Automatisches Backup installieren / Installieren"
+    },
+    {
+      "confluence_id": "786623",
+      "title": "USB Device und Port unter Linux ermitteln (Ebus Adapter)",
+      "desired": "Automatisches Backup installieren / USB Device und Port unter Linux ermitteln (Ebus Adapter)"
+    },
+    {
+      "confluence_id": "786626",
+      "title": "Konfiguration",
+      "desired": "Automatisches Backup installieren / Konfiguration"
+    },
+    {
+      "confluence_id": "786628",
+      "title": "EBUSD_OPTS=\"--device=_dev_ttyUSB0 -p 8888 --scanconfig --accesslevel=* --configpath=_home_pi_ebusd_contrib_etc_ebusd_ --mqtthost=192.168.4.212 --mqttport=1883 --mqtttopic=ebusd_%circuit_%name --enablehex --httpport=8889 --htmlpath=_home_pi_ebusd_contrib_",
+      "desired": "Automatisches Backup installieren / EBUSD_OPTS=\"--device=_dev_ttyUSB0 -p 8888 --scanconfig --accesslevel=* --configpath=_home_pi_ebusd_contrib_etc_ebusd_ --mqtthost=192.168.4.212 --mqttport=1883 --mqtttopic=ebusd_%circuit_%name --enablehex --httpport=8889 --htmlpath=_home_pi_ebusd_contrib_"
+    },
+    {
+      "confluence_id": "786634",
+      "title": "EBus abfragen",
+      "desired": "Automatisches Backup installieren / EBus abfragen"
+    },
+    {
+      "confluence_id": "786637",
+      "title": "Kommandos",
+      "desired": "Automatisches Backup installieren / Kommandos"
+    },
+    {
+      "confluence_id": "786642",
+      "title": "NA_52_Vaillant_VR_70_0109_2903_21_19_34_0020184843_0082_012601_??",
+      "desired": "Automatisches Backup installieren / NA_52_Vaillant_VR_70_0109_2903_21_19_34_0020184843_0082_012601_??"
+    },
+    {
+      "confluence_id": "786644",
+      "title": "NA_15_Vaillant_70000_0613_6903_21_19_36_0020266797_0082_048916_N8",
+      "desired": "Automatisches Backup installieren / NA_15_Vaillant_70000_0613_6903_21_19_36_0020266797_0082_048916_N8"
+    },
+    {
+      "confluence_id": "786646",
+      "title": "Hex Kommandos",
+      "desired": "Automatisches Backup installieren / Hex Kommandos"
+    },
+    {
+      "confluence_id": "786655",
+      "title": "Daten an Volkszähler senden",
+      "desired": "Automatisches Backup installieren / Daten an Volkszähler senden"
+    }
+  ],
+  "errors": [
+    {
+      "action": "move_page",
+      "confluence_id": "1474565",
+      "page_id": 24,
+      "desired": "Linux Befehle",
+      "error": "500 Server Error: Internal Server Error for url: https://bookstack.joerg-middendorf.net/api/pages/24"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "38666241",
+      "page_id": 12,
+      "desired": "Portainer Installieren",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/12"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "40402945",
+      "page_id": 14,
+      "desired": "SSL Zertifikat erstellen und installieren",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/14"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786496",
+      "page_id": 8,
+      "desired": "Hyper Backup auf Strato",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/8"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786518",
+      "page_id": 10,
+      "desired": "SynoCommunity-Repository für Paket Quellen hinzufügen",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/10"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786525",
+      "page_id": 9,
+      "desired": "Nano Editor installieren",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/9"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786541",
+      "page_id": 4,
+      "desired": "Domain einrichten",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/4"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786544",
+      "page_id": 5,
+      "desired": "Reverse Proxy auf Diskstation einrichten",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/5"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786568",
+      "page_id": 7,
+      "desired": "Strato Netzlaufwerk verbinden",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/7"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786589",
+      "page_id": 6,
+      "desired": "Netzwerkkonfiguration",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/6"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "1474569",
+      "page_id": 288,
+      "desired": "Linux Befehle / find",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/288"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "1474581",
+      "page_id": 291,
+      "desired": "Linux Befehle / bash - Skripte ausführen",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/291"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "1474585",
+      "page_id": 295,
+      "desired": "Linux Befehle / cp - Dateien Kopieren oder umbenennen",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/295"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "1474605",
+      "page_id": 290,
+      "desired": "Linux Befehle / apt-update - Pakete von git aktualisieren (fetch all)",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/290"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "1474609",
+      "page_id": 289,
+      "desired": "Linux Befehle / apt-get install Paketname - Pakete von git installieren - (pull)",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/289"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "1474647",
+      "page_id": 293,
+      "desired": "Linux Befehle / cd – Verzeichnis wechseln",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/293"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "1474673",
+      "page_id": 292,
+      "desired": "Linux Befehle / cat – Datei-Inhalt anzeigen",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/292"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786630",
+      "page_id": 299,
+      "desired": "Automatisches Backup installieren / 03_08_Vaillant_HMU00_0307_0403_21_19_36_0010016421_0001_005612_N9",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/299"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786640",
+      "page_id": 300,
+      "desired": "Automatisches Backup installieren / 71_76_Vaillant_VWZ00_0307_0403",
+      "error": "500 Server Error: Internal Server Error for url: https://bookstack.joerg-middendorf.net/api/pages/300"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786708",
+      "page_id": 187,
+      "desired": "1 Volkzaehler Image aufspielen / Übersicht der Standard Passwörter",
+      "error": "500 Server Error: Internal Server Error for url: https://bookstack.joerg-middendorf.net/api/pages/187"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786728",
+      "page_id": 178,
+      "desired": "9 Root Passwort vergeben (optional) / 10 Passwort ändern (optional)",
+      "error": "500 Server Error: Internal Server Error for url: https://bookstack.joerg-middendorf.net/api/pages/178"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786743",
+      "page_id": 172,
+      "desired": "11 SQL Konfiguration / 11.1 SQL Befehle eingeben",
+      "error": "500 Server Error: Internal Server Error for url: https://bookstack.joerg-middendorf.net/api/pages/172"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786754",
+      "page_id": 174,
+      "desired": "Können MariaDB-Einstellungen auf dem Synology NAS angepasst werden? / 11.1.2 Kanal löschen (muss noch etwas besseres geben)_",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/174"
+    },
+    {
+      "action": "move_page",
+      "confluence_id": "786756",
+      "page_id": 170,
+      "desired": "Raspberry Pi_ WLAN einrichten (Edimax) / Verbindung herstellen",
+      "error": "404 Client Error: Not Found for url: https://bookstack.joerg-middendorf.net/api/pages/170"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+[Check] Prüfe Vollständigkeit je Space...
+  [FEHLT] Space AUTO: Book 'Confluence -Auto' nicht gefunden (Confluence Seiten: 28)
+[Check] FEHLER: Mindestens ein Space ist unvollständig oder strukturell abweichend.

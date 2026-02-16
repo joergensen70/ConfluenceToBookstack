@@ -1,0 +1,34 @@
+{
+  "generated_at": "2026-02-16 17:29:55",
+  "spaces": [
+    {
+      "space_key": "AUTO",
+      "space_name": "Auto",
+      "book_name": "Confluence -Auto",
+      "book_candidates": [
+        "Confluence -Auto",
+        "Confluence - Auto",
+        "Confluence - Auto"
+      ],
+      "book_found": false,
+      "expected_pages": 28,
+      "expected_chapters": 2,
+      "expected_direct_pages": 0
+    },
+    {
+      "space_key": "CN",
+      "space_name": "Computer & Netzwerk",
+      "book_name": "Confluence -Computer & Netzwerk",
+      "book_candidates": [
+        "Confluence -Computer & Netzwerk",
+        "Confluence - Computer & Netzwerk",
+        "Confluence - Computer & Netzwerk"
+      ],
+      "book_found": false,
+      "expected_pages": 110,
+      "expected_chapters": 3,
+      "expected_direct_pages": 7
+    }
+  ],
+  "ok": false
+}
