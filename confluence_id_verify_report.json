@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-02-17 12:36:44",
+  "shelf": {
+    "id": 6,
+    "name": "Confluence Migration (isolated)"
+  },
+  "expected_total": 116,
+  "found_total": 115,
+  "missing_total": 1,
+  "duplicate_total": 0,
+  "missing": [
+    {
+      "id": "786589",
+      "title": "Netzwerkkonfiguration"
+    }
+  ],
+  "duplicates": {}
+}

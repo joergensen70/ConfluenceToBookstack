@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Set
 from urllib.parse import parse_qs, urljoin, urlparse
 
 import requests
@@ -45,6 +45,18 @@ class ConfluenceClient:
     def get_space_name(self, space_key: str) -> str:
         data = self._get_json(f"/wiki/rest/api/space/{space_key}")
         return data.get("name") or space_key
+
+    def list_all_spaces(self, limit: int = 50) -> List[dict]:
+        spaces: List[dict] = []
+        start = 0
+        while True:
+            data = self._get_json("/wiki/rest/api/space", params={"limit": limit, "start": start})
+            batch = data.get("results", [])
+            spaces.extend(batch)
+            if len(batch) < limit:
+                break
+            start += limit
+        return spaces
 
     def resolve_space_key(self, requested_space_key: str) -> str:
         requested = (requested_space_key or "").strip()
@@ -155,6 +167,23 @@ class ConfluenceClient:
         data = response.json()
         return data.get("value", storage_html)
 
+    def get_page_detail(self, page_id: str) -> dict:
+        return self._get_json(
+            f"/wiki/rest/api/content/{page_id}",
+            params={"expand": "body.storage,body.view,ancestors"},
+        )
+
+    def _has_meaningful_content(self, html: str) -> bool:
+        """Check if HTML has actual content beyond empty tags"""
+        if not html or not html.strip():
+            return False
+        # Remove common empty tags
+        content = re.sub(r'<p>\s*</p>|<br\s*/?>|<div>\s*</div>', '', html.strip())
+        # Check if there's actual text or images
+        has_text = bool(re.search(r'[a-zA-Z0-9]', content))
+        has_images = bool(re.search(r'<img', content, re.IGNORECASE))
+        return has_text or has_images
+
     def download_binary(self, url: str) -> bytes:
         final_url = url if url.startswith("http") else urljoin(self.base_url, url)
         response = self.session.get(final_url, timeout=120)
@@ -256,6 +285,17 @@ class BookStackClient:
         safe_name = self._trim_name(name, "book")
         return self._request("POST", "/api/books", {"name": safe_name, "description": description})
 
+    def find_chapter_in_book(self, book_id: int, name: str) -> Optional[dict]:
+        """Find a chapter by name in a specific book"""
+        try:
+            book_detail = self._request("GET", f"/api/books/{book_id}")
+            for item in book_detail.get("contents", []):
+                if item.get("type") == "chapter" and item.get("name") == name:
+                    return item
+        except Exception:
+            pass
+        return None
+
     def create_chapter(self, book_id: int, name: str, description: str = "") -> dict:
         safe_name = self._trim_name(name, "chapter")
         return self._request("POST", "/api/chapters", {"book_id": book_id, "name": safe_name, "description": description})
@@ -355,7 +395,12 @@ class BookStackClient:
         shelf = self.find_shelf_by_name(shelf_name)
         if shelf is None:
             return self.create_shelf(shelf_name, description=description, books=normalized)
-        return self.update_shelf_books(int(shelf["id"]), shelf.get("name", shelf_name), normalized)
+
+        shelf_id = int(shelf["id"])
+        detail = self.get_shelf_detail(shelf_id)
+        existing_books = [int(book.get("id", -1)) for book in detail.get("books", [])]
+        merged = sorted({*normalized, *[bid for bid in existing_books if bid > 0]})
+        return self.update_shelf_books(shelf_id, shelf.get("name", shelf_name), merged)
 
 
 class Migrator:
@@ -399,7 +444,32 @@ class Migrator:
             print("Keine Seiten gefunden.")
             return summary
         print(f"Gefunden: {len(pages)} Seiten")
+        
+        # Fetch full content for pages missing body data
+        print(f"[1b/7] Prüfe Seitencontent...")
+        pages_without_content = 0
+        for idx, page in enumerate(pages):
+            page_id = str(page.get("id", ""))
+            view_html = page.get("body", {}).get("view", {}).get("value", "")
+            storage_html = page.get("body", {}).get("storage", {}).get("value", "")
+            
+            has_content = self.conf._has_meaningful_content(view_html) or self.conf._has_meaningful_content(storage_html)
+            
+            if not has_content:
+                pages_without_content += 1
+                try:
+                    if (idx + 1) % 10 == 0:
+                        print(f"  Lade fehlenden Content: {idx + 1}/{len(pages)}...", flush=True)
+                    detail = self.conf.get_page_detail(page_id)
+                    pages[idx] = detail  # Replace with full detail
+                except Exception as exc:
+                    print(f"  [WARN] Fehler beim Laden von Page {page_id}: {exc}", flush=True)
+        
+        if pages_without_content > 0:
+            print(f"  {pages_without_content} Seiten benötigten zusätzlichen Content-Abruf")
+        
         summary["pages_total"] = len(pages)
+        summary["pages_content_fetched"] = pages_without_content
 
         page_map, children, top_level = self._build_structure(pages, space_name)
         overview_text = self._build_overview_markdown(space_name, book_name, page_map, children, top_level)
@@ -439,50 +509,172 @@ class Migrator:
             if self.dry_run:
                 book = {"id": -1, "name": root_title}
             else:
-                book = self.bs.find_book_by_name(root_title) or self.bs.create_book(
-                    root_title,
-                    description=f"Automatisch migriert aus Confluence Space {self.space_key}",
-                )
+                print(f"    Suche oder erstelle Book '{root_title}'...", flush=True)
+                existing_book = self.bs.find_book_by_name(root_title)
+                if existing_book:
+                    print(f"    Book gefunden: ID {existing_book['id']}", flush=True)
+                    book = existing_book
+                else:
+                    print(f"    Erstelle neues Book...", flush=True)
+                    book = self.bs.create_book(
+                        root_title,
+                        description=f"Automatisch migriert aus Confluence Space {self.space_key}",
+                    )
+                    print(f"    Book erstellt: ID {book['id']}", flush=True)
                 book_ids.append(int(book["id"]))
 
             if has_children:
-                for chapter_id in children[root_id]:
+                print(f"    Erstelle {len(children[root_id])} Chapter...", flush=True)
+                for chapter_idx, chapter_id in enumerate(children[root_id], 1):
                     chapter_title = page_map[chapter_id].get("title", "Untitled")
                     if self.dry_run:
-                        bs_chapter_id = -1
+                        bs_chapter_id = 0
                     else:
-                        chapter = self.bs.create_chapter(book["id"], chapter_title)
-                        bs_chapter_id = int(chapter["id"])
-                        print(f"    Kapitel erstellt: {chapter_title} -> {bs_chapter_id}", flush=True)
+                        existing_chapter = self.bs.find_chapter_in_book(int(book["id"]), chapter_title)
+                        if existing_chapter:
+                            bs_chapter_id = int(existing_chapter.get("id", -1))
+                            print(
+                                f"    ({chapter_idx}/{len(children[root_id])}) Kapitel vorhanden: {chapter_title} -> {bs_chapter_id}",
+                                flush=True,
+                            )
+                        else:
+                            # Try to create chapter - if it fails with 422, it might already exist
+                            try:
+                                chapter = self.bs.create_chapter(book["id"], chapter_title)
+                                bs_chapter_id = int(chapter["id"])
+                                print(
+                                    f"    ({chapter_idx}/{len(children[root_id])}) Kapitel: {chapter_title} -> {bs_chapter_id}",
+                                    flush=True,
+                                )
+                                time.sleep(0.2)  # Small delay
+                            except requests.HTTPError as exc:
+                                if exc.response and exc.response.status_code == 422:
+                                    # Chapter already exists - try to find it manually
+                                    existing_chapter = self.bs.find_chapter_in_book(int(book["id"]), chapter_title)
+                                    if existing_chapter:
+                                        bs_chapter_id = int(existing_chapter.get("id", -1))
+                                        print(
+                                            f"    ({chapter_idx}/{len(children[root_id])}) Kapitel existiert bereits: {chapter_title} -> {bs_chapter_id}",
+                                            flush=True,
+                                        )
+                                    else:
+                                        print(
+                                            f"    ({chapter_idx}/{len(children[root_id])}) Kapitel existiert bereits: {chapter_title} (ID unbekannt)",
+                                            flush=True,
+                                        )
+                                        bs_chapter_id = -1
+                                else:
+                                    print(
+                                        f"    [ERROR] Fehler beim Erstellen von Chapter '{chapter_title}': {exc}",
+                                        flush=True,
+                                    )
+                                    bs_chapter_id = -1
+                                    continue
+                            except Exception as exc:
+                                print(f"    [ERROR] Unerwarteter Fehler: {exc}", flush=True)
+                                bs_chapter_id = -1
+                                continue
+
+                    chapter_view = page_map[chapter_id].get("body", {}).get("view", {}).get("value", "")
+                    chapter_storage = page_map[chapter_id].get("body", {}).get("storage", {}).get("value", "")
+                    chapter_has_content = self.conf._has_meaningful_content(chapter_view) or self.conf._has_meaningful_content(
+                        chapter_storage
+                    )
+                    if chapter_has_content:
+                        chapter_content_title = f"{chapter_title} (Kapitelinhalt)"
+                        if self.dry_run:
+                            created_pages.append((chapter_id, chapter_content_title, 0, int(book["id"])))
+                        elif bs_chapter_id > 0:
+                            created_pages.append((chapter_id, chapter_content_title, bs_chapter_id, int(book["id"])))
 
                     descendants = self._collect_descendants(chapter_id, children)
                     for child_id in descendants:
                         if child_id == chapter_id:
                             continue
                         trail = self._build_trail_under_chapter(child_id, page_map, chapter_id)
-                        created_pages.append((child_id, trail, bs_chapter_id, int(book["id"])))
+                        if self.dry_run:
+                            created_pages.append((child_id, trail, 0, int(book["id"])))
+                        elif bs_chapter_id > 0:  # Only add if chapter was created successfully
+                            created_pages.append((child_id, trail, bs_chapter_id, int(book["id"])))
             else:
                 created_pages.append((root_id, root_title, -1, int(book["id"])))
 
         summary["book_ids"] = book_ids
 
+        # Index existing pages to rehydrate missing content (skip in dry-run)
+        existing_index: Dict[Tuple[int, int, str], int] = {}
+        marker_index: Dict[str, int] = {}
+        if not self.dry_run:
+            existing_pages = get_all_bookstack_items(self.bs, "/api/pages")
+            marker_pattern = re.compile(r"confluence_id:(\d+)")
+            for item in existing_pages:
+                b_id = int(item.get("book_id", -1))
+                if b_id not in book_ids:
+                    continue
+                ch_id = int(item.get("chapter_id") or 0)
+                name_key = self._normalize_title(item.get("name", ""))
+                if name_key:
+                    existing_index[(b_id, ch_id, name_key)] = int(item.get("id", -1))
+                page_id = int(item.get("id", -1))
+                if page_id <= 0:
+                    continue
+                try:
+                    detail = self.bs._request("GET", f"/api/pages/{page_id}")
+                    html_text = detail.get("raw_html") or detail.get("html") or ""
+                    for match in marker_pattern.findall(html_text):
+                        marker_index.setdefault(match, page_id)
+                except Exception:
+                    continue
+
         print(f"[5/7] Übertrage Inhalte ({len(created_pages)} Seiten)...")
         confluence_to_bookstack_page: Dict[str, int] = {}
+        migration_stats = {
+            "created": 0,
+            "updated": 0,
+            "skipped_no_content": 0,
+            "skipped_error": 0,
+            "placeholder_content": 0,
+        }
 
         for idx, (conf_page_id, target_title, chapter_id, book_id) in enumerate(created_pages, start=1):
             page_data = page_map[conf_page_id]
             view_html = page_data.get("body", {}).get("view", {}).get("value", "")
             storage_html = page_data.get("body", {}).get("storage", {}).get("value", "")
 
-            if view_html:
+            # Check if we have meaningful content
+            has_view = self.conf._has_meaningful_content(view_html)
+            has_storage = self.conf._has_meaningful_content(storage_html)
+            
+            if not has_view and not has_storage:
+                try:
+                    detail = self.conf.get_page_detail(str(conf_page_id))
+                    view_html = detail.get("body", {}).get("view", {}).get("value", "")
+                    storage_html = detail.get("body", {}).get("storage", {}).get("value", "")
+                    has_view = self.conf._has_meaningful_content(view_html)
+                    has_storage = self.conf._has_meaningful_content(storage_html)
+                except Exception as exc:
+                    print(f"  [WARN] Confluence-Detail nicht geladen ({conf_page_id}): {exc}", flush=True)
+            
+            # Still no content? Use placeholder instead of skipping
+            if not has_view and not has_storage:
+                print(
+                    f"  [WARN] ({idx}/{len(created_pages)}) Keine Inhalte für '{target_title}' gefunden - Platzhalter wird erstellt",
+                    flush=True,
+                )
+                rendered_html = "<p><em>Hinweis: Kein Inhalt in Confluence gefunden.</em></p>"
+                migration_stats["placeholder_content"] += 1
+            elif view_html and has_view:
                 rendered_html = view_html
-            else:
+            elif storage_html and has_storage:
                 try:
                     rendered_html = self.conf.convert_storage_to_view(storage_html)
                 except Exception:
                     rendered_html = storage_html
+            else:
+                rendered_html = "<p>Kein Inhalt verfügbar</p>"
 
             rendered_html = self._normalize_html_links(rendered_html)
+            rendered_html = self._inject_confluence_marker(rendered_html, str(conf_page_id))
             if not rendered_html or not rendered_html.strip():
                 rendered_html = "<p></p>"
 
@@ -492,12 +684,43 @@ class Migrator:
                 print(f"  [dry-run] ({idx}/{len(created_pages)}) {safe_title}")
                 continue
 
+            marker_page_id = marker_index.get(str(conf_page_id))
+            if marker_page_id:
+                bs_page_id = marker_page_id
+                self.bs.update_page_html(bs_page_id, safe_title, rendered_html)
+                confluence_to_bookstack_page[conf_page_id] = bs_page_id
+
+                html_with_local_images, image_count = self._migrate_images(rendered_html, bs_page_id)
+                if image_count > 0 and html_with_local_images and html_with_local_images.strip():
+                    self.bs.update_page_html(bs_page_id, safe_title, html_with_local_images)
+
+                migration_stats["updated"] += 1
+                print(f"  ({idx}/{len(created_pages)}) Aktualisiert (Marker): {safe_title} -> Seite {bs_page_id}, Bilder: {image_count}")
+                continue
+
+            norm_name = self._normalize_title(safe_title)
+            index_key = (int(book_id), int(chapter_id or 0), norm_name)
+
+            if index_key in existing_index:
+                bs_page_id = existing_index[index_key]
+                self.bs.update_page_html(bs_page_id, safe_title, rendered_html)
+                confluence_to_bookstack_page[conf_page_id] = bs_page_id
+
+                html_with_local_images, image_count = self._migrate_images(rendered_html, bs_page_id)
+                if image_count > 0 and html_with_local_images and html_with_local_images.strip():
+                    self.bs.update_page_html(bs_page_id, safe_title, html_with_local_images)
+
+                migration_stats["updated"] += 1
+                print(f"  ({idx}/{len(created_pages)}) Aktualisiert: {safe_title} -> Seite {bs_page_id}, Bilder: {image_count}")
+                continue
+
             if chapter_id > 0:
                 try:
                     created = self.bs.create_page(safe_title, rendered_html, chapter_id=chapter_id)
                 except requests.HTTPError as exc:
                     status = exc.response.status_code if exc.response is not None else "?"
                     print(f"  [WARN] Seite übersprungen (HTTP {status}): {safe_title}", flush=True)
+                    migration_stats["skipped_error"] += 1
                     continue
             else:
                 try:
@@ -505,24 +728,34 @@ class Migrator:
                 except requests.HTTPError as exc:
                     status = exc.response.status_code if exc.response is not None else "?"
                     print(f"  [WARN] Seite übersprungen (HTTP {status}): {safe_title}", flush=True)
+                    migration_stats["skipped_error"] += 1
                     continue
 
             bs_page_id = created["id"]
             confluence_to_bookstack_page[conf_page_id] = bs_page_id
+            marker_index[str(conf_page_id)] = bs_page_id
 
             html_with_local_images, image_count = self._migrate_images(rendered_html, bs_page_id)
             if image_count > 0 and html_with_local_images and html_with_local_images.strip():
                 self.bs.update_page_html(bs_page_id, safe_title, html_with_local_images)
 
+            migration_stats["created"] += 1
             print(f"  ({idx}/{len(created_pages)}) {safe_title} -> Seite {bs_page_id}, Bilder: {image_count}")
 
         print("[6/7] Interne Links umschreiben...")
         if not self.dry_run:
             self._rewrite_internal_links(page_map, confluence_to_bookstack_page)
 
-        print("[7/7] Fertig.")
+        summary["migration_stats"] = migration_stats
+        print(f"\n[7/7] Migration abgeschlossen!")
+        print(f"  Erstellt: {migration_stats['created']}")
+        print(f"  Aktualisiert: {migration_stats['updated']}")
+        print(f"  Platzhalter (kein Content): {migration_stats['placeholder_content']}")
+        print(f"  Übersprungen (kein Content): {migration_stats['skipped_no_content']}")
+        print(f"  Übersprungen (Fehler): {migration_stats['skipped_error']}")
+        
         if self.dry_run:
-            print("Dry-run beendet. Keine Änderungen in BookStack vorgenommen.")
+            print("\nDry-run beendet. Keine Änderungen in BookStack vorgenommen.")
         return summary
 
     def _build_trail_under_chapter(self, page_id: str, page_map: Dict[str, dict], chapter_id: str) -> str:
@@ -600,6 +833,19 @@ class Migrator:
             "pages_level_3_plus": pages_level_3_plus,
         }
 
+    def _extract_sample_words(self, html_text: str, max_words: int = 12) -> str:
+        if not html_text:
+            return ""
+        stripped = re.sub(r"<[^>]+>", " ", html_text)
+        stripped = html.unescape(stripped)
+        stripped = re.sub(r"\s+", " ", stripped).strip()
+        if not stripped:
+            return ""
+        words = stripped.split(" ")
+        if len(words) <= max_words:
+            return stripped
+        return " ".join(words[:max_words]) + "..."
+
     def _build_overview_markdown(
         self,
         space_name: str,
@@ -632,27 +878,52 @@ class Migrator:
         else:
             for book_id in top_level:
                 book_title = page_map[book_id].get("title", "Untitled")
+                book_view = page_map[book_id].get("body", {}).get("view", {}).get("value", "")
+                book_storage = page_map[book_id].get("body", {}).get("storage", {}).get("value", "")
+                book_has_content = self.conf._has_meaningful_content(book_view) or self.conf._has_meaningful_content(
+                    book_storage
+                )
+                book_sample_source = book_view or book_storage
+                book_sample = self._extract_sample_words(book_sample_source)
+                book_marker = "✓" if book_has_content else "⚠"
                 chapter_ids = children.get(book_id, [])
                 page_count = 0
                 for chapter_id in chapter_ids:
                     descendants = self._collect_descendants(chapter_id, children)
                     page_count += max(0, len(descendants) - 1)
-                lines.append(
-                    f"- {book_title} (Chapter: {len(chapter_ids)}, Seiten unterhalb Chapter: {page_count})"
-                )
+                if book_sample:
+                    lines.append(
+                        f"- {book_marker} {book_title} (Chapter: {len(chapter_ids)}, Seiten unterhalb Chapter: {page_count}) — {book_sample}"
+                    )
+                else:
+                    lines.append(
+                        f"- {book_marker} {book_title} (Chapter: {len(chapter_ids)}, Seiten unterhalb Chapter: {page_count})"
+                    )
 
         lines.append("")
         lines.append("## Strukturzuordnung")
         lines.append("")
         lines.append("Format: Buch (oberste Ebene) → Chapter (Ebene darunter) → Seite (darunter)")
+        lines.append("Legende: ✓ = Inhalt vorhanden, ⚠ = leer/kein Inhalt")
         lines.append("")
 
         def add_pages_recursive(node_id: str, depth: int) -> int:
             count = 0
             for child_id in children.get(node_id, []):
                 page_title = page_map[child_id].get("title", "Untitled")
+                view_html = page_map[child_id].get("body", {}).get("view", {}).get("value", "")
+                storage_html = page_map[child_id].get("body", {}).get("storage", {}).get("value", "")
+                has_content = self.conf._has_meaningful_content(view_html) or self.conf._has_meaningful_content(
+                    storage_html
+                )
+                sample_source = view_html or storage_html
+                sample = self._extract_sample_words(sample_source)
+                marker = "✓" if has_content else "⚠"
                 indent = "  " * depth
-                lines.append(f"{indent}- Seite: {page_title}")
+                if sample:
+                    lines.append(f"{indent}- {marker} Seite: {page_title} — {sample}")
+                else:
+                    lines.append(f"{indent}- {marker} Seite: {page_title}")
                 count += 1
                 count += add_pages_recursive(child_id, depth + 1)
             return count
@@ -666,13 +937,36 @@ class Migrator:
 
                 lines.append(f"### Buch: {book_title}")
                 if not chapter_ids:
+                    book_view = page_map[book_id].get("body", {}).get("view", {}).get("value", "")
+                    book_storage = page_map[book_id].get("body", {}).get("storage", {}).get("value", "")
+                    book_has_content = self.conf._has_meaningful_content(book_view) or self.conf._has_meaningful_content(
+                        book_storage
+                    )
+                    book_sample_source = book_view or book_storage
+                    book_sample = self._extract_sample_words(book_sample_source)
+                    book_marker = "✓" if book_has_content else "⚠"
+                    if book_sample:
+                        lines.append(f"- {book_marker} Buch-Inhalt — {book_sample}")
+                    else:
+                        lines.append(f"- {book_marker} Buch-Inhalt")
                     lines.append("- _(Keine Chapter)_")
                     lines.append("")
                     continue
 
                 for chapter_id in chapter_ids:
                     chapter_title = page_map[chapter_id].get("title", "Untitled")
-                    lines.append(f"- Chapter: {chapter_title}")
+                    chapter_view = page_map[chapter_id].get("body", {}).get("view", {}).get("value", "")
+                    chapter_storage = page_map[chapter_id].get("body", {}).get("storage", {}).get("value", "")
+                    chapter_has_content = self.conf._has_meaningful_content(chapter_view) or self.conf._has_meaningful_content(
+                        chapter_storage
+                    )
+                    chapter_sample_source = chapter_view or chapter_storage
+                    chapter_sample = self._extract_sample_words(chapter_sample_source)
+                    chapter_marker = "✓" if chapter_has_content else "⚠"
+                    if chapter_sample:
+                        lines.append(f"- {chapter_marker} Chapter: {chapter_title} — {chapter_sample}")
+                    else:
+                        lines.append(f"- {chapter_marker} Chapter: {chapter_title}")
                     page_count = add_pages_recursive(chapter_id, 1)
                     if page_count == 0:
                         lines.append("  - _(Keine Seiten)_")
@@ -732,6 +1026,13 @@ class Migrator:
 
         return self.IMG_SRC_PATTERN.sub(repl, html)
 
+    def _inject_confluence_marker(self, html: str, confluence_id: str) -> str:
+        marker = f"<!-- confluence_id:{confluence_id} -->"
+        footer = f"<p><small>Confluence-ID: {confluence_id}</small></p>"
+        if marker in html or footer in html:
+            return html
+        return f"{html}\n{footer}\n{marker}"
+
     def _migrate_images(self, html: str, bookstack_page_id: int) -> Tuple[str, int]:
         replacements: Dict[str, str] = {}
         unique_sources = []
@@ -790,7 +1091,7 @@ class Migrator:
                 self.bs.update_page_html(bs_page_id, name, new_html)
 
 
-def load_config_from_env() -> Config:
+def load_config_from_env(require_space_key: bool = True) -> Config:
     env_path = Path(".env")
     if env_path.exists():
         for raw_line in env_path.read_text(encoding="utf-8").splitlines():
@@ -807,11 +1108,12 @@ def load_config_from_env() -> Config:
         "CONFLUENCE_BASE_URL",
         "CONFLUENCE_EMAIL",
         "CONFLUENCE_API_TOKEN",
-        "CONFLUENCE_SPACE_KEY",
         "BOOKSTACK_BASE_URL",
         "BOOKSTACK_TOKEN_ID",
         "BOOKSTACK_TOKEN_SECRET",
     ]
+    if require_space_key:
+        required.append("CONFLUENCE_SPACE_KEY")
 
     missing = [k for k in required if not os.getenv(k)]
     if missing:
@@ -820,11 +1122,12 @@ def load_config_from_env() -> Config:
     placeholder_patterns = {
         "CONFLUENCE_EMAIL": ["dein.name@beispiel.de", "example.com", "@beispiel.de"],
         "CONFLUENCE_API_TOKEN": ["atlassian_api_token", "changeme", "placeholder"],
-        "CONFLUENCE_SPACE_KEY": ["DEIN_SPACE_KEY", "your_space_key", "space_key"],
         "BOOKSTACK_BASE_URL": ["dein-bookstack.example.com", "example.com"],
         "BOOKSTACK_TOKEN_ID": ["bookstack_token_id", "changeme", "placeholder"],
         "BOOKSTACK_TOKEN_SECRET": ["bookstack_token_secret", "changeme", "placeholder"],
     }
+    if require_space_key:
+        placeholder_patterns["CONFLUENCE_SPACE_KEY"] = ["DEIN_SPACE_KEY", "your_space_key", "space_key"]
 
     placeholders_found: List[str] = []
     for key, tokens in placeholder_patterns.items():
@@ -851,7 +1154,7 @@ def load_config_from_env() -> Config:
         confluence_base_url=os.environ["CONFLUENCE_BASE_URL"],
         confluence_email=os.environ["CONFLUENCE_EMAIL"],
         confluence_api_token=os.environ["CONFLUENCE_API_TOKEN"],
-        confluence_space_key=os.environ["CONFLUENCE_SPACE_KEY"],
+        confluence_space_key=os.environ.get("CONFLUENCE_SPACE_KEY", ""),
         bookstack_base_url=os.environ["BOOKSTACK_BASE_URL"],
         bookstack_token_id=os.environ["BOOKSTACK_TOKEN_ID"],
         bookstack_token_secret=os.environ["BOOKSTACK_TOKEN_SECRET"],
@@ -898,6 +1201,27 @@ def _print_bookstack_auth_hints(status: str, body: str) -> None:
         print("   - Authorization Header fehlt oder ist falsch formatiert.")
 
 
+def _print_bookstack_debug_details(config: Config) -> None:
+    base_url = config.bookstack_base_url or ""
+    token_id = config.bookstack_token_id or ""
+    token_secret = config.bookstack_token_secret or ""
+    has_ws_id = bool(re.search(r"\s", token_id))
+    has_ws_secret = bool(re.search(r"\s", token_secret))
+
+    print("  Debug BookStack:")
+    print(f"   - BOOKSTACK_BASE_URL: {base_url}")
+    print(f"   - Token ID Laenge: {len(token_id)} (Whitespace: {has_ws_id})")
+    print(f"   - Token Secret Laenge: {len(token_secret)} (Whitespace: {has_ws_secret})")
+    print(f"   - Authorization Header: Token {token_id}:<redacted>")
+
+    try:
+        parsed = urlparse(base_url)
+        if parsed.path and parsed.path not in ("/", ""):
+            print("   - WARN: BOOKSTACK_BASE_URL sollte keinen Pfad enthalten (nur Domain).")
+    except Exception:
+        print("   - WARN: BOOKSTACK_BASE_URL konnte nicht geparst werden.")
+
+
 def check_credentials(config: Config, debug_auth: bool = False) -> int:
     print("[Auth-Check] Prüfe Confluence-Zugriff...")
     try:
@@ -920,6 +1244,8 @@ def check_credentials(config: Config, debug_auth: bool = False) -> int:
 
     print("[Auth-Check] Prüfe BookStack-Zugriff...")
     try:
+        if debug_auth:
+            _print_bookstack_debug_details(config)
         bs = BookStackClient(config.bookstack_base_url, config.bookstack_token_id, config.bookstack_token_secret)
         system_info = bs.check_access()
         instance_name = system_info.get("app_name") or system_info.get("name") or "BookStack"
@@ -939,6 +1265,55 @@ def check_credentials(config: Config, debug_auth: bool = False) -> int:
         return 11
 
     print("[Auth-Check] Beide Verbindungen sind OK.")
+    return 0
+
+
+def test_apis(config: Config) -> int:
+    print("[API-Test] Prüfe Confluence API...")
+    try:
+        conf = ConfluenceClient(config.confluence_base_url, config.confluence_email, config.confluence_api_token)
+        spaces = conf.list_all_spaces()
+        print(f"  OK: Confluence API erreichbar (Spaces: {len(spaces)})")
+    except Exception as exc:
+        print(f"  FEHLER: Confluence API nicht erreichbar ({exc})")
+        return 20
+
+    print("[API-Test] Prüfe BookStack API...")
+    try:
+        bs = BookStackClient(config.bookstack_base_url, config.bookstack_token_id, config.bookstack_token_secret)
+        data = bs._request("GET", "/api/books?count=1")
+        total = data.get("total") if isinstance(data, dict) else None
+        print(f"  OK: BookStack API erreichbar (Books total: {total})")
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else "?"
+        body = exc.response.text[:500] if exc.response is not None else ""
+        print(f"  FEHLER: BookStack API nicht erreichbar (HTTP {status}) {body}")
+        return 21
+    except Exception as exc:
+        print(f"  FEHLER: BookStack API nicht erreichbar ({exc})")
+        return 21
+
+    print("[API-Test] Beide APIs sind erreichbar.")
+    return 0
+
+
+def list_confluence_spaces(config: Config) -> int:
+    try:
+        conf = ConfluenceClient(config.confluence_base_url, config.confluence_email, config.confluence_api_token)
+        spaces = conf.list_all_spaces()
+    except Exception as exc:
+        print(f"Fehler beim Laden der Spaces: {exc}")
+        return 30
+
+    print(f"Gefundene Spaces: {len(spaces)}")
+    if not spaces:
+        return 0
+
+    for space in spaces:
+        key = space.get("key", "?")
+        name = space.get("name", "Unbekannt")
+        stype = space.get("type", "?")
+        print(f"\n  [{key}] {name}\n      Typ: {stype}")
     return 0
 
 
@@ -977,6 +1352,19 @@ def normalize_book_name(value: str) -> str:
     text = re.sub(r"\s+", " ", text)
     text = re.sub(r"\s*-\s*", "-", text)
     return text
+
+
+def normalize_title_key(value: str) -> str:
+    text = (value or "").strip().lower()
+    text = re.sub(r"\s+", " ", text)
+    return text
+
+
+def score_page_content(bs: BookStackClient, page_id: int) -> Tuple[int, int, int]:
+    detail = bs._request("GET", f"/api/pages/{page_id}")
+    html_text = detail.get("raw_html") or detail.get("html") or ""
+    img_count = len(re.findall(r"<img\b", html_text, flags=re.IGNORECASE))
+    return (img_count, len(html_text), page_id)
 
 
 def build_expected_book_names(prefix: str, space_name: str) -> List[str]:
@@ -1057,6 +1445,10 @@ def check_migration_completeness(config: Config, resolved_spaces: List[Tuple[str
             for chapter_id in children.get(root_id, []):
                 descendants = inspector._collect_descendants(chapter_id, children)
                 expected_pages += max(0, len(descendants) - 1)
+                chapter_view = page_map[chapter_id].get("body", {}).get("view", {}).get("value", "")
+                chapter_storage = page_map[chapter_id].get("body", {}).get("storage", {}).get("value", "")
+                if conf._has_meaningful_content(chapter_view) or conf._has_meaningful_content(chapter_storage):
+                    expected_pages += 1
             if expected_chapters == 0:
                 expected_pages = 1
 
@@ -1085,7 +1477,11 @@ def check_migration_completeness(config: Config, resolved_spaces: List[Tuple[str
             chapter_ids = {int(chapter.get("id", -1)) for chapter in chapters_in_book}
             pages_in_book = [page for page in all_pages if int(page.get("book_id", -1)) == book_id]
 
-            direct_pages = [page for page in pages_in_book if page.get("chapter_id") is None]
+            direct_pages = [
+                page
+                for page in pages_in_book
+                if page.get("chapter_id") in (None, 0, "0", "")
+            ]
             chapter_pages = [
                 page
                 for page in pages_in_book
@@ -1138,6 +1534,239 @@ def check_migration_completeness(config: Config, resolved_spaces: List[Tuple[str
     return 0
 
 
+def verify_confluence_id_markers(config: Config, resolved_spaces: List[Tuple[str, str, str]], shelf_name: str, report_file: str) -> int:
+    conf = ConfluenceClient(config.confluence_base_url, config.confluence_email, config.confluence_api_token)
+    bs = BookStackClient(config.bookstack_base_url, config.bookstack_token_id, config.bookstack_token_secret)
+
+    shelf = bs.find_shelf_by_name(shelf_name)
+    if not shelf:
+        print(f"[Verify] Shelf nicht gefunden: {shelf_name}")
+        return 50
+
+    shelf_detail = bs.get_shelf_detail(int(shelf["id"]))
+    shelf_books = shelf_detail.get("books", [])
+    book_ids = {int(book.get("id", -1)) for book in shelf_books if int(book.get("id", -1)) > 0}
+
+    if not book_ids:
+        print("[Verify] Keine Books im Shelf gefunden.")
+        return 0
+
+    expected_ids: Set[str] = set()
+    expected_titles: Dict[str, str] = {}
+    for _, resolved_space, resolved_name in resolved_spaces:
+        pages = conf.list_pages_in_space(resolved_space)
+        run_cfg = Config(
+            confluence_base_url=config.confluence_base_url,
+            confluence_email=config.confluence_email,
+            confluence_api_token=config.confluence_api_token,
+            confluence_space_key=resolved_space,
+            bookstack_base_url=config.bookstack_base_url,
+            bookstack_token_id=config.bookstack_token_id,
+            bookstack_token_secret=config.bookstack_token_secret,
+            book_name_prefix=config.book_name_prefix,
+        )
+        inspector = Migrator(run_cfg, space_key=resolved_space, dry_run=True, auto_confirm=True, overview_only=True)
+        page_map, children, top_level = inspector._build_structure(pages, resolved_name)
+
+        for root_id in top_level:
+            has_children = len(children.get(root_id, [])) > 0
+            if not has_children:
+                expected_ids.add(str(root_id))
+                expected_titles.setdefault(str(root_id), page_map[root_id].get("title", "Untitled"))
+                continue
+
+            for chapter_id in children.get(root_id, []):
+                chapter_view = page_map[chapter_id].get("body", {}).get("view", {}).get("value", "")
+                chapter_storage = page_map[chapter_id].get("body", {}).get("storage", {}).get("value", "")
+                chapter_has_content = conf._has_meaningful_content(chapter_view) or conf._has_meaningful_content(
+                    chapter_storage
+                )
+                if chapter_has_content:
+                    expected_ids.add(str(chapter_id))
+                    expected_titles.setdefault(str(chapter_id), page_map[chapter_id].get("title", "Untitled"))
+
+                descendants = inspector._collect_descendants(chapter_id, children)
+                for child_id in descendants:
+                    if child_id == chapter_id:
+                        continue
+                    expected_ids.add(str(child_id))
+                    expected_titles.setdefault(str(child_id), page_map[child_id].get("title", "Untitled"))
+
+    pages = [p for p in get_all_bookstack_items(bs, "/api/pages") if int(p.get("book_id", -1)) in book_ids]
+    marker_pattern = re.compile(r"confluence_id:(\d+)")
+    found_map: Dict[str, List[int]] = {}
+
+    for page in pages:
+        pid = int(page.get("id", -1))
+        if pid <= 0:
+            continue
+        try:
+            detail = bs._request("GET", f"/api/pages/{pid}")
+        except Exception:
+            continue
+        html_text = detail.get("raw_html") or detail.get("html") or ""
+        for match in marker_pattern.findall(html_text):
+            found_map.setdefault(match, []).append(pid)
+
+    missing = sorted([pid for pid in expected_ids if pid not in found_map])
+    duplicates = {pid: ids for pid, ids in found_map.items() if len(ids) > 1}
+
+    report = {
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "shelf": {"id": int(shelf.get("id", -1)), "name": shelf.get("name", shelf_name)},
+        "expected_total": len(expected_ids),
+        "found_total": len(found_map),
+        "missing_total": len(missing),
+        "duplicate_total": len(duplicates),
+        "missing": [{"id": pid, "title": expected_titles.get(pid, "")} for pid in missing],
+        "duplicates": duplicates,
+    }
+
+    Path(report_file).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"[Verify] Report: {report_file}")
+    if missing:
+        print(f"[Verify] FEHLER: Fehlende IDs: {len(missing)}")
+        return 51
+    if duplicates:
+        print(f"[Verify] WARNUNG: Doppelte IDs: {len(duplicates)}")
+        return 52
+
+    print("[Verify] OK: Alle Confluence-IDs wurden gefunden.")
+    return 0
+
+
+def cleanup_duplicate_content(config: Config, shelf_name: str, assume_yes: bool, report_file: str) -> int:
+    bs = BookStackClient(config.bookstack_base_url, config.bookstack_token_id, config.bookstack_token_secret)
+
+    shelf = bs.find_shelf_by_name(shelf_name)
+    if not shelf:
+        print(f"[Cleanup] Shelf nicht gefunden: {shelf_name}")
+        return 40
+
+    shelf_detail = bs.get_shelf_detail(int(shelf["id"]))
+    shelf_books = shelf_detail.get("books", [])
+    book_ids = {int(book.get("id", -1)) for book in shelf_books if int(book.get("id", -1)) > 0}
+
+    if not book_ids:
+        print("[Cleanup] Keine Books im Shelf gefunden.")
+        return 0
+
+    chapters = [c for c in get_all_bookstack_items(bs, "/api/chapters") if int(c.get("book_id", -1)) in book_ids]
+    pages = [p for p in get_all_bookstack_items(bs, "/api/pages") if int(p.get("book_id", -1)) in book_ids]
+
+    pages_by_chapter: Dict[int, List[dict]] = {}
+    for page in pages:
+        cid = int(page.get("chapter_id") or 0)
+        pages_by_chapter.setdefault(cid, []).append(page)
+
+    chapter_duplicates: List[dict] = []
+    delete_chapter_ids: Set[int] = set()
+
+    by_chapter_key: Dict[Tuple[int, str], List[dict]] = {}
+    for chapter in chapters:
+        key = (int(chapter.get("book_id", -1)), normalize_title_key(chapter.get("name", "")))
+        by_chapter_key.setdefault(key, []).append(chapter)
+
+    for (_, _), group in by_chapter_key.items():
+        if len(group) <= 1:
+            continue
+        scored = []
+        for chapter in group:
+            cid = int(chapter.get("id", -1))
+            page_count = len(pages_by_chapter.get(cid, []))
+            scored.append((page_count, -cid, chapter))
+        scored.sort(reverse=True)
+        keep = scored[0][2]
+        keep_id = int(keep.get("id", -1))
+        for _, _, dup in scored[1:]:
+            dup_id = int(dup.get("id", -1))
+            if dup_id > 0:
+                delete_chapter_ids.add(dup_id)
+                chapter_duplicates.append(
+                    {
+                        "book_id": int(dup.get("book_id", -1)),
+                        "chapter_id": dup_id,
+                        "name": dup.get("name", ""),
+                        "kept_chapter_id": keep_id,
+                    }
+                )
+
+    page_duplicates: List[dict] = []
+    delete_page_ids: Set[int] = set()
+    by_page_key: Dict[Tuple[int, int, str], List[dict]] = {}
+    for page in pages:
+        chapter_id = int(page.get("chapter_id") or 0)
+        if chapter_id in delete_chapter_ids:
+            continue
+        key = (int(page.get("book_id", -1)), chapter_id, normalize_title_key(page.get("name", "")))
+        by_page_key.setdefault(key, []).append(page)
+
+    for (_, _, _), group in by_page_key.items():
+        if len(group) <= 1:
+            continue
+        scored = []
+        for page in group:
+            pid = int(page.get("id", -1))
+            try:
+                scored.append((score_page_content(bs, pid), page))
+            except Exception:
+                scored.append(((0, 0, pid), page))
+        scored.sort(reverse=True)
+        keep = scored[0][1]
+        keep_id = int(keep.get("id", -1))
+        for _, dup in scored[1:]:
+            dup_id = int(dup.get("id", -1))
+            if dup_id > 0:
+                delete_page_ids.add(dup_id)
+                page_duplicates.append(
+                    {
+                        "book_id": int(dup.get("book_id", -1)),
+                        "chapter_id": int(dup.get("chapter_id") or 0),
+                        "page_id": dup_id,
+                        "name": dup.get("name", ""),
+                        "kept_page_id": keep_id,
+                    }
+                )
+
+    report = {
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "shelf": {"id": int(shelf.get("id", -1)), "name": shelf.get("name", shelf_name)},
+        "books": list(book_ids),
+        "chapter_duplicates": chapter_duplicates,
+        "page_duplicates": page_duplicates,
+    }
+    Path(report_file).write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    if not (chapter_duplicates or page_duplicates):
+        print("[Cleanup] Keine Duplikate gefunden.")
+        return 0
+
+    print(f"[Cleanup] Duplikate: Chapters={len(chapter_duplicates)} | Pages={len(page_duplicates)}")
+    print(f"[Cleanup] Report: {report_file}")
+
+    if not assume_yes:
+        if not sys.stdin.isatty():
+            print("Nicht-interaktive Sitzung erkannt. Bitte mit --yes bestaetigen.")
+            return 41
+        answer = input("Duplikate jetzt loeschen? [y/N]: ").strip().lower()
+        if answer not in ("y", "yes", "j", "ja"):
+            print("Abbruch auf Benutzerwunsch.")
+            return 0
+
+    deleted_chapters = 0
+    for chapter_id in sorted(delete_chapter_ids):
+        bs._request("DELETE", f"/api/chapters/{chapter_id}")
+        deleted_chapters += 1
+
+    deleted_pages = 0
+    for page_id in sorted(delete_page_ids):
+        bs._request("DELETE", f"/api/pages/{page_id}")
+        deleted_pages += 1
+
+    print(f"[Cleanup] Geloescht: Chapters={deleted_chapters} | Pages={deleted_pages}")
+    return 0
+
+
 def parse_space_keys(value: str) -> List[str]:
     parts = [part.strip() for part in (value or "").split(",")]
     return [part for part in parts if part]
@@ -1150,6 +1779,16 @@ def main() -> int:
         "--check-credentials",
         action="store_true",
         help="Nur Zugangsdaten prüfen (Confluence + BookStack), keine Migration ausführen",
+    )
+    parser.add_argument(
+        "--test-apis",
+        action="store_true",
+        help="Testet Confluence- und BookStack-API (ohne Migration)",
+    )
+    parser.add_argument(
+        "--list-spaces",
+        action="store_true",
+        help="Listet alle Confluence Spaces (Keys + Namen)",
     )
     parser.add_argument(
         "--debug-auth",
@@ -1165,6 +1804,16 @@ def main() -> int:
         "--overview-file",
         default="",
         help="Pfad für die Übersichtsdatei (Default: migration_overview_<space>.md)",
+    )
+    parser.add_argument(
+        "--preview-structure",
+        action="store_true",
+        help="Erstellt eine Struktur-Preview als Markdown (Alias für --overview-only)",
+    )
+    parser.add_argument(
+        "--preview-file",
+        default="",
+        help="Pfad für die Preview-Datei (Alias für --overview-file)",
     )
     parser.add_argument(
         "--yes",
@@ -1186,13 +1835,48 @@ def main() -> int:
         action="store_true",
         help="Nur Vollständigkeit/Struktur je Space prüfen, keine Migration ausführen",
     )
+    parser.add_argument(
+        "--verify-ids",
+        action="store_true",
+        help="Prueft Confluence-ID Marker in BookStack Seiten",
+    )
+    parser.add_argument(
+        "--verify-report",
+        default="confluence_id_verify_report.json",
+        help="Pfad fuer den ID-Verify Report (Default: confluence_id_verify_report.json)",
+    )
+    parser.add_argument(
+        "--cleanup-duplicates",
+        action="store_true",
+        help="Entfernt doppelte Chapter/Seiten in den Books des Shelfs",
+    )
+    parser.add_argument(
+        "--cleanup-report",
+        default="duplicate_cleanup_report.json",
+        help="Pfad fuer den Duplikat-Report (Default: duplicate_cleanup_report.json)",
+    )
     args = parser.parse_args()
 
+    if args.preview_structure and not args.overview_only:
+        args.overview_only = True
+    if args.preview_file and not args.overview_file:
+        args.overview_file = args.preview_file
+
     try:
-        cfg = load_config_from_env()
+        require_space_key = not (args.list_spaces or args.test_apis)
+        cfg = load_config_from_env(require_space_key=require_space_key)
     except Exception as exc:
         print(exc)
         return 1
+
+    if args.cleanup_duplicates:
+        return cleanup_duplicate_content(cfg, args.shelf_name, args.yes, args.cleanup_report)
+
+    if args.list_spaces:
+        return list_confluence_spaces(cfg)
+
+    if args.test_apis:
+        return test_apis(cfg)
 
     requested_spaces = parse_space_keys(args.spaces)
     if not requested_spaces:
@@ -1208,6 +1892,9 @@ def main() -> int:
     except Exception as exc:
         print(f"Fehler bei Space-Auflösung: {exc}")
         return 1
+
+    if args.verify_ids:
+        return verify_confluence_id_markers(cfg, resolved_spaces, args.shelf_name, args.verify_report)
 
     if args.check_credentials or args.debug_auth:
         print("[Auth-Check] Aufgelöste Spaces:")

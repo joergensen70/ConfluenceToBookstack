@@ -1,33 +1,155 @@
 {
-  "generated_at": "2026-02-16 17:29:55",
+  "generated_at": "2026-02-17 11:43:32",
   "spaces": [
     {
       "space_key": "AUTO",
       "space_name": "Auto",
-      "book_name": "Confluence -Auto",
+      "book_name": "Passat",
+      "book_found": true,
+      "book_id": 83,
+      "expected_pages": 2,
+      "actual_pages": 2,
+      "expected_chapters": 2,
+      "actual_chapters": 2,
+      "expected_direct_pages": 0,
+      "actual_direct_pages": 0,
+      "actual_chapter_pages": 2,
+      "ok": true
+    },
+    {
+      "space_key": "AUTO",
+      "space_name": "Auto",
+      "book_name": "Umbauten Cliff 600",
+      "book_found": true,
+      "book_id": 84,
+      "expected_pages": 13,
+      "actual_pages": 13,
+      "expected_chapters": 23,
+      "actual_chapters": 23,
+      "expected_direct_pages": 0,
+      "actual_direct_pages": 0,
+      "actual_chapter_pages": 13,
+      "ok": true
+    },
+    {
+      "space_key": "CN",
+      "space_name": "Computer & Netzwerk",
+      "book_name": "FTP Zugang",
       "book_candidates": [
-        "Confluence -Auto",
-        "Confluence - Auto",
-        "Confluence - Auto"
+        "FTP Zugang"
       ],
       "book_found": false,
-      "expected_pages": 28,
-      "expected_chapters": 2,
+      "expected_pages": 1,
+      "expected_chapters": 0,
+      "expected_direct_pages": 1
+    },
+    {
+      "space_key": "CN",
+      "space_name": "Computer & Netzwerk",
+      "book_name": "Volkszähler",
+      "book_candidates": [
+        "Volkszähler"
+      ],
+      "book_found": false,
+      "expected_pages": 55,
+      "expected_chapters": 25,
       "expected_direct_pages": 0
     },
     {
       "space_key": "CN",
       "space_name": "Computer & Netzwerk",
-      "book_name": "Confluence -Computer & Netzwerk",
+      "book_name": "Optional Hostname für myFritz (IPv6 only)",
       "book_candidates": [
-        "Confluence -Computer & Netzwerk",
-        "Confluence - Computer & Netzwerk",
-        "Confluence - Computer & Netzwerk"
+        "Optional Hostname für myFritz (IPv6 only)"
       ],
       "book_found": false,
-      "expected_pages": 110,
-      "expected_chapters": 3,
-      "expected_direct_pages": 7
+      "expected_pages": 1,
+      "expected_chapters": 0,
+      "expected_direct_pages": 1
+    },
+    {
+      "space_key": "CN",
+      "space_name": "Computer & Netzwerk",
+      "book_name": "Putty",
+      "book_candidates": [
+        "Putty"
+      ],
+      "book_found": false,
+      "expected_pages": 1,
+      "expected_chapters": 0,
+      "expected_direct_pages": 1
+    },
+    {
+      "space_key": "CN",
+      "space_name": "Computer & Netzwerk",
+      "book_name": "Moved to bookstack",
+      "book_candidates": [
+        "Moved to bookstack"
+      ],
+      "book_found": false,
+      "expected_pages": 38,
+      "expected_chapters": 17,
+      "expected_direct_pages": 0
+    },
+    {
+      "space_key": "CN",
+      "space_name": "Computer & Netzwerk",
+      "book_name": "Outlook 365 winmail.dat Problem",
+      "book_candidates": [
+        "Outlook 365 winmail.dat Problem"
+      ],
+      "book_found": false,
+      "expected_pages": 1,
+      "expected_chapters": 0,
+      "expected_direct_pages": 1
+    },
+    {
+      "space_key": "CN",
+      "space_name": "Computer & Netzwerk",
+      "book_name": "RS485/Modbus Stromzähler an NodeRed",
+      "book_candidates": [
+        "RS485/Modbus Stromzähler an NodeRed"
+      ],
+      "book_found": false,
+      "expected_pages": 1,
+      "expected_chapters": 0,
+      "expected_direct_pages": 1
+    },
+    {
+      "space_key": "CN",
+      "space_name": "Computer & Netzwerk",
+      "book_name": "CN Migration Testseite mit Bild 2026-02-16 14:33:13",
+      "book_candidates": [
+        "CN Migration Testseite mit Bild 2026-02-16 14:33:13"
+      ],
+      "book_found": false,
+      "expected_pages": 1,
+      "expected_chapters": 0,
+      "expected_direct_pages": 1
+    },
+    {
+      "space_key": "CN",
+      "space_name": "Computer & Netzwerk",
+      "book_name": "Anleitungsartikel",
+      "book_candidates": [
+        "Anleitungsartikel"
+      ],
+      "book_found": false,
+      "expected_pages": 1,
+      "expected_chapters": 1,
+      "expected_direct_pages": 0
+    },
+    {
+      "space_key": "CN",
+      "space_name": "Computer & Netzwerk",
+      "book_name": "Web Cam",
+      "book_candidates": [
+        "Web Cam"
+      ],
+      "book_found": false,
+      "expected_pages": 1,
+      "expected_chapters": 0,
+      "expected_direct_pages": 1
     }
   ],
   "ok": false
